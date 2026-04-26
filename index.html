@@ -196,16 +196,14 @@
     .siswa-info.err  { color: var(--danger); }
     .siswa-info.load { color: var(--muted); }
 
-    /* ============================================================
-       MANUAL FALLBACK — kotak input nama & kelas
-    ============================================================ */
+    /* MANUAL FALLBACK */
     #manual-input-wrap {
       margin-top: 14px;
       background: var(--warn-soft);
       border: 1.5px solid var(--warn);
       border-radius: var(--radius-sm);
       padding: 16px;
-      display: none; /* tampil via JS */
+      display: none;
       animation: fadeSlideIn 0.3s ease;
     }
     @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
@@ -214,9 +212,7 @@
       font-size: 12px; font-weight: 700; color: #92400e;
       margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em;
     }
-    .manual-header .warn-dot {
-      width: 8px; height: 8px; border-radius: 50%; background: var(--warn); flex-shrink: 0;
-    }
+    .manual-header .warn-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--warn); flex-shrink: 0; }
     .manual-field { margin-bottom: 10px; }
     .manual-field:last-child { margin-bottom: 0; }
     .manual-field label { display: block; font-size: 11px; font-weight: 600; color: #78350f; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
@@ -317,6 +313,78 @@
     .opt-text { font-size: 15px; color: var(--text); line-height: 1.5; padding-top: 2px; }
     .opt-img { max-width: 220px; border-radius: var(--radius-xs); margin-top: 8px; display: block; border: 1px solid var(--border); }
 
+    /* ============================================================
+       READING LOCK TIMER
+    ============================================================ */
+    .reading-lock-bar {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--accent-soft); border: 1.5px solid var(--accent-mid);
+      border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 16px;
+      transition: background 0.5s ease, border-color 0.5s ease;
+    }
+    .reading-lock-bar.unlocked {
+      background: var(--success-soft);
+      border-color: var(--success);
+    }
+    .rlock-icon {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(108,99,255,0.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+      transition: background 0.5s ease;
+    }
+    .reading-lock-bar.unlocked .rlock-icon { background: rgba(34,197,94,0.15); }
+    .rlock-body { flex: 1; min-width: 0; }
+    .rlock-label {
+      font-size: 12px; font-weight: 600; color: var(--accent);
+      margin-bottom: 6px; line-height: 1.4;
+      transition: color 0.5s ease;
+    }
+    .reading-lock-bar.unlocked .rlock-label { color: var(--success); }
+    .rlock-track {
+      height: 5px; background: rgba(108,99,255,0.15);
+      border-radius: 99px; overflow: hidden;
+    }
+    .rlock-fill {
+      height: 100%; background: var(--accent); border-radius: 99px;
+      transition: width 1s linear, background 0.5s ease;
+    }
+    .reading-lock-bar.unlocked .rlock-fill { background: var(--success); }
+    .rlock-count {
+      font-size: 20px; font-weight: 800; color: var(--accent);
+      min-width: 36px; text-align: right; flex-shrink: 0;
+      transition: color 0.5s ease;
+      font-variant-numeric: tabular-nums;
+    }
+    .reading-lock-bar.unlocked .rlock-count { color: var(--success); font-size: 14px; font-weight: 600; }
+
+    /* Kunci opsi saat timer berjalan */
+    .option-item.locked { pointer-events: none; }
+    .option-item.locked .option-label {
+      opacity: 0.4;
+      cursor: not-allowed;
+      background: var(--bg);
+    }
+    .option-item.locked .option-label:hover {
+      border-color: var(--border);
+      background: var(--bg);
+    }
+
+    .rlock-notice {
+      font-size: 12px; color: var(--muted); text-align: center;
+      margin-top: 8px; letter-spacing: 0.02em; font-style: italic;
+    }
+
+    /* Animasi unlock opsi */
+    .option-item.unlocking {
+      animation: optionReveal 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+    @keyframes optionReveal {
+      from { opacity: 0.4; transform: translateX(-4px); }
+      to   { opacity: 1;   transform: translateX(0); }
+    }
+
+    /* NAV & SUBMIT */
     .nav-btns { display: flex; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 20px; }
     .btn-nav { padding: 12px 24px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); background: var(--surface); font-size: 14px; font-weight: 600; font-family: var(--font); color: var(--text); cursor: pointer; transition: 0.15s; display: flex; align-items: center; gap: 8px; }
     .btn-nav:hover { border-color: var(--accent); color: var(--accent); }
@@ -407,16 +475,12 @@
     </div>
     <div class="login-card">
 
-      <!-- Nomor Peserta -->
       <div class="field">
         <label>Nomor Peserta</label>
         <input type="text" id="no_peserta" placeholder="Contoh: 2024001" oninput="cekPeserta()">
         <div class="siswa-info" id="info_siswa"></div>
       </div>
 
-      <!-- =========================================================
-           MANUAL FALLBACK — muncul jika nomor peserta tidak ditemukan
-      ========================================================= -->
       <div id="manual-input-wrap">
         <div class="manual-header">
           <div class="warn-dot"></div>
@@ -435,7 +499,6 @@
         </div>
       </div>
 
-      <!-- Mata Pelajaran -->
       <div class="field" style="margin-top: 20px;">
         <label>Mata Pelajaran</label>
         <input type="text" id="select_mapel" placeholder="Ketik mata pelajaran (HURUF KAPITAL)"
@@ -444,7 +507,6 @@
         <div class="siswa-info" id="info_mapel"></div>
       </div>
 
-      <!-- Password -->
       <div class="field">
         <label>Password Mulai</label>
         <input type="password" id="pass_mulai" placeholder="Masukkan password dari pengawas">
@@ -531,6 +593,7 @@
   ============================================================ */
   var scriptURL = 'https://script.google.com/macros/s/AKfycbyrPkVOkM6Fy0AZDZXNZfRuTHyS1Fx2hH_xPAXu4YPOIsceFRyrlBOW7AhQ8mxls3wy/exec';
   var LOGO_FILE_ID = '1yTZeAuc0NtiGVd3MT_vTj1E2F4VmOLhL';
+  var READING_LOCK_SECS = 15; /* Durasi kunci baca (detik) — ubah sesuai kebutuhan */
 
   /* ============================================================
      SPLASH
@@ -588,7 +651,7 @@
   ============================================================ */
   var dataSiswa = [], dataMapel = [], soalLoaded = [], soalAcak = [];
   var siswaAktif = null, timerCek = null;
-  var modeManual = false;   // flag: true jika user isi manual
+  var modeManual = false;
   var currentIdx = 0;
   var jawaban = {};
 
@@ -685,7 +748,7 @@
   function closeModal() { document.getElementById('modal-overlay').classList.remove('show'); }
 
   /* ============================================================
-     CEK PESERTA — tampilkan/sembunyikan form manual
+     CEK PESERTA
   ============================================================ */
   function cekPeserta() {
     var no   = document.getElementById('no_peserta').value.trim();
@@ -709,13 +772,11 @@
         info.innerHTML = '✓ ' + siswaAktif[1] + ' · ' + siswaAktif[2];
         manualWrap.style.display = 'none';
         modeManual = false;
-        /* kosongkan field manual jika sempat terisi */
         document.getElementById('manual_nama').value  = '';
         document.getElementById('manual_kelas').value = '';
       } else {
         info.className = 'siswa-info err';
         info.innerHTML = '✕ Nomor peserta tidak terdaftar';
-        /* Tampilkan form manual */
         manualWrap.style.display = 'block';
         modeManual = true;
       }
@@ -749,27 +810,20 @@
     var passInput = document.getElementById('pass_mulai').value;
     var mapelObj  = dataMapel.find(function(m) { return m[0].toString().toUpperCase() === mapelName; });
 
-    /* --- Validasi identitas --- */
     if (modeManual) {
-      /* Mode manual: cek nama & kelas diisi */
       var namaManual  = document.getElementById('manual_nama').value.trim();
       var kelasManual = document.getElementById('manual_kelas').value.trim();
       if (!namaManual)  return toast('error', 'Nama Wajib Diisi', 'Isi nama lengkap pada form manual.');
       if (!kelasManual) return toast('error', 'Kelas Wajib Diisi', 'Isi kelas pada form manual.');
-      /* Buat objek siswa sementara agar kode di bawah tetap konsisten */
       siswaAktif = [document.getElementById('no_peserta').value.trim() || '-', namaManual, kelasManual];
     } else {
       if (!siswaAktif) return toast('error', 'Peserta Tidak Valid', 'Masukkan nomor peserta yang terdaftar.');
     }
 
-    /* --- Validasi mapel --- */
     if (!mapelName) return toast('warn', 'Pilih Mata Pelajaran', 'Silakan isi mata pelajaran terlebih dahulu.');
     if (!mapelObj)  return toast('error', 'Mata Pelajaran Tidak Valid', 'Mata pelajaran tidak ditemukan di data.');
-
-    /* --- Validasi password --- */
     if (passInput !== mapelObj[1].toString()) return toast('error', 'Password Salah', 'Password mulai ujian tidak sesuai.');
 
-    /* --- Muat soal --- */
     var btn = document.getElementById('btn_mulai');
     btn.disabled = true;
     btn.innerHTML = '<div class="spinner"></div> Memuat soal...';
@@ -895,7 +949,7 @@
   }
 
   /* ============================================================
-     RENDER QUESTION
+     IMAGE LOADER
   ============================================================ */
   function extractDriveId(url) {
     if (!url) return null;
@@ -926,18 +980,32 @@
     });
   }
 
+  /* ============================================================
+     RENDER QUESTION — dengan Reading Lock Timer
+  ============================================================ */
+  var readingTimer = null;
+
   function renderQuestion(idx) {
     currentIdx = idx;
+
+    /* Hentikan timer soal sebelumnya jika masih berjalan */
+    if (readingTimer) {
+      clearInterval(readingTimer);
+      readingTimer = null;
+    }
+
     var s = soalAcak[idx];
     var card = document.getElementById('q-card');
     var optKeys = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+
+    /* Bangun HTML opsi — semua dikunci dulu */
     var optsHTML = '';
     optKeys.forEach(function(L) {
       if (!s[L]) return;
       var imgKey  = 'Img_' + L;
       var checked = jawaban[idx] === L ? 'checked' : '';
       optsHTML +=
-        '<div class="option-item">' +
+        '<div class="option-item locked" id="optrow_' + L + '">' +
           '<input type="radio" name="soal_q" id="opt_' + L + '" value="' + L + '" ' + checked + ' onchange="pilihJawaban(\'' + L + '\')">' +
           '<label class="option-label" for="opt_' + L + '">' +
             '<span class="opt-key">' + L + '</span>' +
@@ -947,15 +1015,112 @@
           '</label>' +
         '</div>';
     });
+
+    /*
+     * Soal yang sudah pernah dijawab: langsung tampilkan tanpa timer
+     * agar peserta bisa review dan ganti jawaban dengan bebas.
+     */
+    var alreadyAnswered = jawaban[idx] !== undefined;
+
+    var lockHTML = '';
+    if (!alreadyAnswered) {
+      lockHTML =
+        '<div class="reading-lock-bar" id="rlock-bar">' +
+          '<div class="rlock-icon">⏱</div>' +
+          '<div class="rlock-body">' +
+            '<div class="rlock-label" id="rlock-label">' +
+              'Baca soal dulu — pilihan terbuka dalam <span id="rlock-secs">' + READING_LOCK_SECS + '</span> detik' +
+            '</div>' +
+            '<div class="rlock-track">' +
+              '<div class="rlock-fill" id="rlock-fill" style="width:100%"></div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="rlock-count" id="rlock-count">' + READING_LOCK_SECS + '</div>' +
+        '</div>' +
+        '<p class="rlock-notice" id="rlock-notice">Pilihan akan aktif setelah waktu membaca selesai.</p>';
+    }
+
     card.innerHTML =
       '<div class="q-number-tag">Soal ' + (idx + 1) + ' dari ' + soalAcak.length + '</div>' +
       '<div class="q-text">' + s.Soal + '</div>' +
       (s.Img_Soal ? '<img data-src="' + s.Img_Soal + '" class="q-img" style="min-height:80px;background:var(--bg)">' : '') +
+      lockHTML +
       '<div class="option-list">' + optsHTML + '</div>';
+
     renderNav();
     updatePalette();
     loadImagesOnCard();
     window.scrollTo({ top: document.getElementById('hal_soal').offsetTop - 20, behavior: 'smooth' });
+
+    /* Jika soal sudah dijawab → buka langsung semua opsi, tidak perlu timer */
+    if (alreadyAnswered) {
+      optKeys.forEach(function(L) {
+        var row = document.getElementById('optrow_' + L);
+        if (row) row.classList.remove('locked');
+      });
+      return;
+    }
+
+    /* ---- Jalankan countdown ---- */
+    var secsLeft = READING_LOCK_SECS;
+
+    readingTimer = setInterval(function() {
+      secsLeft--;
+
+      var fillEl   = document.getElementById('rlock-fill');
+      var countEl  = document.getElementById('rlock-count');
+      var secsEl   = document.getElementById('rlock-secs');
+
+      /* Guard: jika elemen sudah tidak ada (user navigasi cepat) */
+      if (!fillEl) { clearInterval(readingTimer); readingTimer = null; return; }
+
+      /* Update progress bar & angka */
+      fillEl.style.width   = (secsLeft / READING_LOCK_SECS * 100) + '%';
+      if (countEl) countEl.textContent = secsLeft > 0 ? secsLeft : '';
+      if (secsEl)  secsEl.textContent  = secsLeft > 0 ? secsLeft : '0';
+
+      /* Warna bar berubah mendekati merah saat < 5 detik tersisa */
+      if (secsLeft <= 5 && secsLeft > 0) {
+        fillEl.style.background = '#f59e0b'; /* warn amber */
+        var barEl = document.getElementById('rlock-bar');
+        if (barEl) {
+          barEl.style.background   = '#fef3c7';
+          barEl.style.borderColor  = '#f59e0b';
+        }
+        var labelEl = document.getElementById('rlock-label');
+        if (labelEl) labelEl.style.color = '#92400e';
+        if (countEl) countEl.style.color = '#d97706';
+      }
+
+      if (secsLeft <= 0) {
+        clearInterval(readingTimer);
+        readingTimer = null;
+
+        /* Ubah tampilan bar menjadi hijau (unlock) */
+        var bar    = document.getElementById('rlock-bar');
+        var label  = document.getElementById('rlock-label');
+        var notice = document.getElementById('rlock-notice');
+        var cnt    = document.getElementById('rlock-count');
+
+        if (bar)    bar.classList.add('unlocked');
+        if (label)  { label.innerHTML = '✓ Waktu membaca selesai — silakan pilih jawaban'; label.style.color = ''; }
+        if (notice) notice.textContent = '';
+        if (cnt)    { cnt.textContent = ''; }
+
+        /* Buka kunci semua opsi dengan animasi stagger */
+        var delay = 0;
+        optKeys.forEach(function(L) {
+          var row = document.getElementById('optrow_' + L);
+          if (!row) return;
+          setTimeout(function() {
+            row.classList.remove('locked');
+            row.classList.add('unlocking');
+            setTimeout(function() { row.classList.remove('unlocking'); }, 400);
+          }, delay);
+          delay += 60; /* stagger 60ms tiap opsi */
+        });
+      }
+    }, 1000);
   }
 
   function pilihJawaban(val) { jawaban[currentIdx] = val; updatePalette(); }
@@ -972,7 +1137,10 @@
 
   function goTo(idx) { if (idx < 0 || idx >= soalAcak.length) return; renderQuestion(idx); }
   function goToNext() {
-    if (jawaban[currentIdx] === undefined) { toast('warn', 'Belum Dijawab', 'Pilih salah satu jawaban terlebih dahulu.'); return; }
+    if (jawaban[currentIdx] === undefined) {
+      toast('warn', 'Belum Dijawab', 'Pilih salah satu jawaban terlebih dahulu.');
+      return;
+    }
     if (currentIdx < soalAcak.length - 1) goTo(currentIdx + 1);
     else toast('info', 'Soal Terakhir', 'Kamu sudah di soal terakhir. Silakan kirim jawaban jika sudah selesai.');
   }
@@ -982,7 +1150,7 @@
   ============================================================ */
   function validasiKirim() {
     var passInput = document.getElementById('pass_selesai').value;
-    var mapelName = document.getElementById('txt_mapel_siswa').textContent; // ambil dari header ujian (sudah tervalidasi)
+    var mapelName = document.getElementById('txt_mapel_siswa').textContent;
     var mapelObj  = dataMapel.find(function(m) { return m[0] === mapelName; });
 
     if (!mapelObj) { toast('error', 'Data Mapel Error', 'Terjadi kesalahan data. Muat ulang halaman.'); return; }
@@ -1021,13 +1189,13 @@
     var nilai = ((benar / soalAcak.length) * 100).toFixed(2);
 
     var payload = {
-      action    : 'simpanHasil',
-      nama      : siswaAktif[1],
-      kelas     : siswaAktif[2],
-      mapel     : mapelName,
-      jawaban   : jwbArr.join(','),
-      nilai     : nilai,
-      mode_manual: modeManual   // flag agar GAS bisa menandai baris manual jika perlu
+      action     : 'simpanHasil',
+      nama       : siswaAktif[1],
+      kelas      : siswaAktif[2],
+      mapel      : mapelName,
+      jawaban    : jwbArr.join(','),
+      nilai      : nilai,
+      mode_manual: modeManual
     };
 
     fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
